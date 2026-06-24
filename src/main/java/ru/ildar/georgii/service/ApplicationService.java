@@ -5,6 +5,7 @@ import ru.ildar.georgii.dto.ApplicationDTO;
 import ru.ildar.georgii.dto.ApplicationRequestDTO;
 import ru.ildar.georgii.dto.ApplicationResponseDTO;
 import ru.ildar.georgii.entity.Application;
+import ru.ildar.georgii.entity.ApplicationEvent;
 import ru.ildar.georgii.entity.ApplicationStatus;
 import ru.ildar.georgii.repo.Repository;
 
@@ -17,8 +18,41 @@ public class ApplicationService {
 
     private final Repository repository;
 
-    public ApplicationService (Repository repository) {
+    private final StateMachineService stateMachineService;
+
+    public ApplicationService (Repository repository, StateMachineService stateMachineService) {
         this.repository = repository;
+        this.stateMachineService = stateMachineService;
+    }
+
+    public Application assign(Long id) {
+
+        return stateMachineService.processOrderPayment(id, ApplicationEvent.ASSIGN);
+
+    }
+
+    public Application begin(Long id) {
+
+        return stateMachineService.processOrderPayment(id, ApplicationEvent.BEGIN);
+
+    }
+
+    public Application complete(Long id) {
+
+        return stateMachineService.processOrderPayment(id, ApplicationEvent.COMPLETE);
+
+    }
+
+    public Application deleteState(Long id) {
+
+        return stateMachineService.processOrderPayment(id, ApplicationEvent.DELETE);
+
+    }
+
+    public Application expire(Long id) {
+
+        return stateMachineService.processOrderPayment(id, ApplicationEvent.EXPIRE);
+
     }
 
     public Application mapToEntity(ApplicationRequestDTO applicationRequestDTO){

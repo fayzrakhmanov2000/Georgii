@@ -2,6 +2,7 @@ package ru.ildar.georgii.statemachine;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.config.EnableStateMachine;
+import org.springframework.statemachine.config.EnableStateMachineFactory;
 import org.springframework.statemachine.config.StateMachineConfigurerAdapter;
 import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
 import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
@@ -12,7 +13,7 @@ import static ru.ildar.georgii.entity.ApplicationEvent.*;
 import static ru.ildar.georgii.entity.ApplicationStatus.*;
 
 @Configuration
-@EnableStateMachine
+@EnableStateMachineFactory
 public class StateMachineConfig extends StateMachineConfigurerAdapter<ApplicationStatus, ApplicationEvent> {
 
     @Override
