@@ -1,10 +1,11 @@
-package ru.ildar.rest;
+package ru.ildar.georgii.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.ildar.entity.Application;
-import ru.ildar.repo.Repository;
+import ru.ildar.georgii.dto.ApplicationRequestDTO;
+import ru.ildar.georgii.dto.ApplicationResponseDTO;
+import ru.ildar.georgii.service.ApplicationService;
 
 import java.util.List;
 
@@ -12,58 +13,44 @@ import java.util.List;
 @RequestMapping("/api/applications")
 public class Controller {
 
-    private final Repository repository;
+    private final ApplicationService applicationService;
 
-    public Controller(Repository repository) {
-        this.repository = repository;
+    public Controller(ApplicationService applicationService) {
+        this.applicationService = applicationService;
     }
 
     @GetMapping
-    public List<Application> getAllProducts() {
-        return repository.findAll();
+    public List<ApplicationResponseDTO> getAllApplications() {
+        return applicationService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Application> getApplicationById(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(application -> ResponseEntity.ok(application))
+    public ResponseEntity<ApplicationResponseDTO> getApplicationById(@PathVariable Long id) {
+        return applicationService.findById(id)
+                .map(applicationResponseDTO -> ResponseEntity.ok(applicationResponseDTO))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Application> createProduct(@RequestBody Application application) {
-        Application savedApplication = repository.save(application);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedApplication);
+    public ResponseEntity<ApplicationResponseDTO> createProduct(@RequestBody ApplicationRequestDTO applicationRequestDTO) {
+        ApplicationResponseDTO applicationResponseDTO = applicationService.save(applicationRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(applicationResponseDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Application> updateProduct(@PathVariable Long id,
-                                                     @RequestBody Application applicationDetails) {
-        return repository.findById(id)
-                .map(existingApplication -> {
-                    existingApplication.setId(applicationDetails.getId());
-                    existingApplication.setTitle(applicationDetails.getTitle());
-                    existingApplication.setDescription(applicationDetails.getDescription());
-                    existingApplication.setCreatedAt(applicationDetails.getCreatedAt());
-                    existingApplication.setUpdatedAt(applicationDetails.getUpdatedAt());
-                    existingApplication.setStartAt(applicationDetails.getStartAt());
-                    existingApplication.setEndAt(applicationDetails.getEndAt());
-                    existingApplication.setExpirationAt(applicationDetails.getExpirationAt());
-                    existingApplication.setStatus(applicationDetails.getStatus());
-                    existingApplication.setUserId(applicationDetails.getUserId());
-                    Application updatedApplication = repository.save(existingApplication);
-                    return ResponseEntity.ok(updatedApplication);
-                })
+    public ResponseEntity<ApplicationResponseDTO> updateProduct(@PathVariable Long id,
+                                                                @RequestBody ApplicationRequestDTO applicationRequestDTO) {
+        return applicationService.update(id, applicationRequestDTO)
+                .map(applicationResponseDTO -> ResponseEntity.ok(applicationResponseDTO))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteProduct(@PathVariable Long id) {
-        return repository.findById(id)
-                .map(application -> {
-                    repository.delete(application);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        if (applicationService.findById(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        applicationService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

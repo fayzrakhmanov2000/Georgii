@@ -1,9 +1,9 @@
-package ru.ildar.entity;
+package ru.ildar.georgii.entity;
 
 public enum ApplicationStatus {
     CREATED,
     ASSIGNED,
-    BEGIN,
+    BEGAN,
     COMPLETED,
     DELETED,
     EXPIRED
