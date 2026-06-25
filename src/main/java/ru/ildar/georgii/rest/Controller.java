@@ -33,13 +33,13 @@ public class Controller {
     }
 
     @PostMapping
-    public ResponseEntity<ApplicationResponseDTO> createProduct(@RequestBody ApplicationRequestDTO applicationRequestDTO) {
+    public ResponseEntity<ApplicationResponseDTO> createApplication(@RequestBody ApplicationRequestDTO applicationRequestDTO) {
         ApplicationResponseDTO applicationResponseDTO = applicationService.save(applicationRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(applicationResponseDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApplicationResponseDTO> updateProduct(@PathVariable Long id,
+    public ResponseEntity<ApplicationResponseDTO> updateApplication(@PathVariable Long id,
                                                                 @RequestBody ApplicationRequestDTO applicationRequestDTO) {
         return applicationService.update(id, applicationRequestDTO)
                 .map(applicationResponseDTO -> ResponseEntity.ok(applicationResponseDTO))
@@ -47,7 +47,7 @@ public class Controller {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteApplication(@PathVariable Long id) {
         if (applicationService.findById(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
