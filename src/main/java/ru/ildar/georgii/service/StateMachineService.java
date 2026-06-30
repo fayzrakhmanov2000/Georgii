@@ -8,20 +8,24 @@ import org.springframework.stereotype.Service;
 import ru.ildar.georgii.entity.Application;
 import ru.ildar.georgii.entity.ApplicationEvent;
 import ru.ildar.georgii.entity.ApplicationStatus;
+import ru.ildar.georgii.kafka.ApplicationEventProducer;
 import ru.ildar.georgii.repo.Repository;
 
-import static ru.ildar.georgii.entity.ApplicationEvent.CREATE;
+import java.time.Instant;
 
 @Service
 public class StateMachineService {
 
     private final Repository repository;
     private final StateMachineFactory<ApplicationStatus, ApplicationEvent> stateMachineFactory;
+    private final ApplicationEventProducer applicationEventProducer;
 
     public StateMachineService(Repository repository,
-                               StateMachineFactory<ApplicationStatus, ApplicationEvent> stateMachineFactory) {
+                               StateMachineFactory<ApplicationStatus, ApplicationEvent> stateMachineFactory,
+                               ApplicationEventProducer applicationEventProducer) {
         this.repository = repository;
         this.stateMachineFactory = stateMachineFactory;
+        this.applicationEventProducer = applicationEventProducer;
     }
 
     public Application processOrderPayment(Long id, ApplicationEvent event) {
@@ -42,9 +46,17 @@ public class StateMachineService {
         if (isAccepted) {
             application.setStatus(stateMachine.getState().getId());
             repository.save(application);
+            applicationEventProducer.sendStatusChange(id, application.getStatus());
         } else {
             throw new IllegalStateException("Невозможный переход");
         }
         return application;
+    }
+
+    public void shedulerStatusChange(Application application) {
+        if (application.getExpirationAt() != null
+                && application.getExpirationAt().toInstant().isBefore(Instant.now())) {
+            processOrderPayment(application.getId(), ApplicationEvent.EXPIRE);
+        }
     }
 }
