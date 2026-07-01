@@ -29,5 +29,12 @@ services:
     volumes:
       - kafka-data:/var/lib/kafka/data
 
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"   # SMTP — сюда шлёт JavaMailSender
+      - "8025:8025"   # веб-интерфейс — открой в браузере, увидишь письма
+
 volumes:
   kafka-data:
+

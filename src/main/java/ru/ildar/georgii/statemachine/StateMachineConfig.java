@@ -36,9 +36,11 @@ public class StateMachineConfig extends StateMachineConfigurerAdapter<Applicatio
                 .and()
                 .withExternal().source(BEGAN).target(COMPLETED).event(COMPLETE)
                 .and()
-                .withExternal().source(COMPLETED).target(DELETED).event(DELETE)
+                .withExternal().source(CREATED).target(EXPIRED).event(EXPIRE)
                 .and()
-                .withExternal().source(DELETED).target(EXPIRED).event(EXPIRE);
+                .withExternal().source(ASSIGNED).target(EXPIRED).event(EXPIRE)
+                .and()
+                .withExternal().source(BEGAN).target(EXPIRED).event(EXPIRE);
     }
 }
 
